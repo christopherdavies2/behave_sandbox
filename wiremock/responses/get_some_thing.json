@@ -1,0 +1,17 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/some/thing"
+  },
+  "response": {
+    "status": 200,
+    "jsonBody": {
+      "aBool": true,
+      "aString": "Hello world!",
+      "anInt": 5
+    },
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
