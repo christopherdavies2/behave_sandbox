@@ -1,0 +1,29 @@
+version: "3.7"
+
+services:
+
+  behave_test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: behave_test
+    command: bash -c "sleep 1; behave"
+    depends_on:
+      - wiremock
+    networks:
+      - systemtest
+
+  wiremock:
+    build:
+      context: .
+      dockerfile: wiremock.Dockerfile
+    container_name: wiremock
+    ports:
+      - 8080:8080
+    networks:
+      systemtest:
+        aliases:
+          - wiremock
+
+networks:
+  systemtest:

@@ -1,0 +1,1 @@
+FROM rodolpheche/wiremock:2.26.0-alpine
