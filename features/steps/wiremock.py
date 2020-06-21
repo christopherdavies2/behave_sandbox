@@ -7,26 +7,8 @@ from behave import *
 @given("I have mocked an endpoint")
 def step_impl(context):
     # set up a mocked endpoint and response
-    mocked_response = """
-    {
-        "request": {
-            "method": "GET",
-            "urlPath": "/some/thing"
-        },
-        "response": {
-            "status": 200,
-            "jsonBody": {
-                "aBool": true,
-                "aString": "Hello world!",
-                "anInt": 5
-            },
-            "headers": {
-                "Content-Type": "application/json"
-            }
-        }
-    }
-    """
-
+    file = open("../wiremock/responses/get_some_thing.json", "r")
+    mocked_response = file.read()
     mapping = json.loads(mocked_response)
     requests.post(url='http://wiremock:8080/__admin/mappings', headers={'Content-Type': 'application/json'},
                   json=mapping)
@@ -39,13 +21,19 @@ def step_impl(context):
 
 @then("I get the mocked response")
 def step_impl(context):
-    res = context.response
-    assert res.status_code == 200
-    assert res.headers['Content-Type'] == 'application/json'
+    response = context.response
+    assert response.status_code == 200
+    assert response.headers['Content-Type'] == 'application/json'
 
-    body = json.loads(res.text)
-    assert len(body) == 3
+    file = open("../expected/responses/get_some_thing.json")
+    contents = file.read()
 
-    assert body['aBool']
-    assert re.search("Hello world", body['aString'])
-    assert body['anInt'] == 5
+    exp_body = json.loads(contents)
+    act_body = json.loads(response.text)
+
+    assert len(act_body) == 3
+    assert act_body == exp_body
+
+    # Example of assertion using regex
+    assert re.search("Hello world", act_body['aString'])
+
