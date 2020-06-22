@@ -1,15 +1,13 @@
 import json
 import re
 import os
-from typing import TextIO
-
 import requests
+
 from behave import *
 
 
 @given("I have mocked an endpoint")
 def step_impl(context):
-    # set up a mocked endpoint and response
     with open("wiremock/responses/get_some_thing.json") as json_data_file:
         mocked_response = json_data_file.read()
     mapping = json.loads(mocked_response)
