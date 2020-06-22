@@ -1,5 +1,8 @@
 import json
 import re
+import os
+from typing import TextIO
+
 import requests
 from behave import *
 
@@ -7,16 +10,16 @@ from behave import *
 @given("I have mocked an endpoint")
 def step_impl(context):
     # set up a mocked endpoint and response
-    file = open("wiremock/responses/get_some_thing.json", "r")
-    mocked_response = file.read()
+    with open("wiremock/responses/get_some_thing.json") as json_data_file:
+        mocked_response = json_data_file.read()
     mapping = json.loads(mocked_response)
-    requests.post(url='http://localhost:8080/__admin/mappings', headers={'Content-Type': 'application/json'},
+    requests.post(url=f'http://{os.environ["WIREMOCK_BASE_URI"]}/__admin/mappings', headers={'Content-Type': 'application/json'},
                   json=mapping)
 
 
 @when("I call the mock endpoint")
 def step_impl(context):
-    context.response = requests.get('http://localhost:8080/some/thing')
+    context.response = requests.get(f'http://{os.environ["WIREMOCK_BASE_URI"]}/some/thing')
 
 
 @then("I get the mocked response")
@@ -25,8 +28,8 @@ def step_impl(context):
     assert response.status_code == 200
     assert response.headers['Content-Type'] == 'application/json'
 
-    file = open("expected/responses/get_some_thing.json")
-    contents = file.read()
+    with open("expected/responses/get_some_thing.json") as json_data_file:
+        contents = json_data_file.read()
 
     exp_body = json.loads(contents)
     act_body = json.loads(response.text)

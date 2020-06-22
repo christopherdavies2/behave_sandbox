@@ -8,6 +8,8 @@ services:
       dockerfile: Dockerfile
     container_name: behave_test
     command: bash -c "sleep 1; behave"
+    env_file:
+      - config/.env-common
     depends_on:
       - wiremock
     networks:
